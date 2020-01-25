@@ -4,23 +4,26 @@ import time
 import random
 import copy
 
+from bases.colors import COLORS
+import bases.interfaces as INTERFACE
+
 
 class BOARD():
 
-    def __init__(self, width, height, cellSize=30, x=0, y=0):
+    def __init__(self, width, height):
         self.width = width
         self.height = height
-        self.cellSize = cellSize
-        self.x = x
-        self.y = y
+        self.cellSize = None
+        self.BLACK = COLORS.BLACK
+        self.x = 0
+        self.y = 0
         self.cells = [[-1] * (self.width + 10)
                       for i in range(self.height + 10)]
-        self.color = [(1, 1, 1), (0, 0, 255), (255, 0, 0)]
-
-    def setView(self, x, y, size):
+        self.surface = pygame.Surface([1, 1])
+    
+    def setCoords(self, x, y):
         self.x = x
         self.y = y
-        self.cellSize = size
 
     def resize(self, x, y):
         self.width = x
@@ -43,19 +46,23 @@ class BOARD():
         return resX, resY
 
     def on_click(self, cell):
-        pass
+        print(cell)
 
     def click(self, mouse_pos):
         cell = self.get_cell(mouse_pos)
         if cell is not None:
             self.on_click(cell)
 
-    def renderCells(self, screen):
+    def autoSizer(self, width, height):
+        self.cellSize = int(min(width / self.width, height / self.height))
+        self.surface = pygame.Surface([self.width * self.cellSize, self.height * self.cellSize])
+
+    def renderCells(self, screen, xMax, yMax):
+        self.surface.fill(self.BLACK)
         for i in range(self.width):
             for j in range(self.height):
-                pygame.draw.rect(screen, self.color[0], (self.x + i * self.cellSize,
+                pygame.draw.rect(self.surface, self.BLACK, (self.x + i * self.cellSize,
                                                          self.y + j * self.cellSize, self.cellSize, self.cellSize))
-                pygame.draw.rect(screen, self.color[1], (self.x + i * self.cellSize,
-                                                         self.y + j * self.cellSize, self.cellSize, self.cellSize))
-                pygame.draw.rect(screen, (200, 200, 200), (self.x + i * self.cellSize,
+                pygame.draw.rect(self.surface, (200, 200, 200), (self.x + i * self.cellSize,
                                                            self.y + j * self.cellSize, self.cellSize, self.cellSize), 1)
+        screen.blit(self.surface, (int((xMax -  self.cellSize * self.width) / 2), 0))
