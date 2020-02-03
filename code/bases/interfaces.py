@@ -3,11 +3,40 @@
     INTERFACES. ONLY FUNCTION CLASSES.
 
 '''
-class  IMAGE_LOADER():
+import pygame
+
+class CONTROLLED():
+    def initControlKeys(self, keys={}):
+        pass
+
+
+class IMAGE_LOADER():
     def load(self):
-        import pygame
         self.image = pygame.image.load(self.folder + self.texturename).convert_alpha()
         self.rect = self.image.get_rect()
+        self.mask = pygame.mask.from_surface(self.image)
+
+class DRAWABLE():
+    def draw(self, screen):
+        screen.blit(self.image, self.rect)
+
+class DRAWABLE_PER_COORDS():
+    def draw_per_coords(self, screen, x, y):
+        self.rect.x = x
+        self.rect.y = y
+        screen.blit(self.image, self.rect)
+
+class CROSSABLE():
+    def isCrossing(self, item):
+        return pygame.sprite.spritecollideany(self, item)
+
+    def isMaskCrossing(self, item):
+        return pygame.sprite.collide_mask(self, item)
+
+class CHECKER():
+    def areCrossed(self, item1, item2):
+        pass
+        
 
 
 class STATICABLE():
@@ -58,23 +87,23 @@ class MOVEABLE():
 class MOVE_ANIMATED(MOVEABLE):
 
     def moveImagesInit(self, moveImages):
-        self.moveImages = moveImages
+        self.texturename = moveImages
 
     def changeMoveTexture(self, frame, vector):
         if frame == -1:
             print(
                 "MOVE_ANIMATED CLASS ERROR, HAVE -1 MOVING FRAME ON MOVING EVENT. object: ", self)
         else:
-            self.imageName = self.moveImages[vector][frame]
+            self.texturename = self.moveImages[vector][frame]
 
 
 class MOVE_FRAME(MOVEABLE):
 
     def moveImagesInit(self):
-        self.moveImages = moveImages
+        self.texturename = moveImages
 
     def changeMoveTexture(self, frame, vector):
-        self.imageName = self.moveImages[frame]
+        self.texturename = self.moveImages[frame]
 
 
 class MOVE_VECTOR(MOVEABLE):
@@ -83,7 +112,7 @@ class MOVE_VECTOR(MOVEABLE):
         self.moveImages = moveImages
 
     def changeMoveTexture(self, frame, vector):
-        self.imageName = self.moveImages[vector]
+        self.texturename = self.moveImages[vector]
 
 
 #STATIC METHODS
@@ -98,20 +127,19 @@ class STATIC_ANIMATED(STATICABLE):
             print(
                 "STATIC_ANIMATED CLASS ERROR, HAVE -1 MOVING FRAME ON STATIC EVENT. object: ", self)
         else:
-            self.imageName = self.staticImages[vector][frame]
+            self.texturename = self.staticImages[vector][frame]
 
 
 class STATIC_VECTOR(STATICABLE):
 
     def changeStaticTexture(self, frame, vector):
-        self.imageName = self.staticImages[vector]
+        self.texturename = self.staticImages[vector]
 
 
 class STATIC_FRAME(STATICABLE):
 
     def changeStaticTexture(self, frame, vector):
-        self.imageName = self.staticImages[frame]
-
+        self.texturename = self.staticImages[frame]
 
 
 #UI METHODS

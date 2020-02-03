@@ -36,14 +36,20 @@ class ESSENCE(pygame.sprite.Sprite, INTERFACE.IMAGE_LOADER):
         self.rect.x = self.x * size
         self.rect.y = self.y * size
 
-class STATIC_DECORATION(ESSENCE):
-
+class STATIC_DECORATION(ESSENCE, INTERFACE.DRAWABLE):
     def __init__(self, x, y, folder, texturename):
         ESSENCE.__init__(self, x, y, folder)
         self.texturename = texturename
         self.load()
+
+class RANDOMWALL(STATIC_DECORATION, INTERFACE.DRAWABLE_PER_COORDS):
+    def __init__(self, x, y, folder, randomImages):
+        import random
+        texturename = random.choice(randomImages)
+        STATIC_DECORATION.__init__(self, x, y, folder, texturename)
+
         
-class BULLET(ESSENCE, INTERFACE.MOVE_ANIMATED):
+class BULLET(ESSENCE, INTERFACE.MOVE_ANIMATED, INTERFACE.CROSSABLE, INTERFACE.DRAWABLE):
 
     def __init__(self, parent, vector, speed=1, folder="data/essences/bullet/"):
         self.parent = parent
@@ -52,10 +58,10 @@ class BULLET(ESSENCE, INTERFACE.MOVE_ANIMATED):
         super(BULLET, self).__init__(parent.x, parent.y, folder)
 
 
-class PLAYER(ESSENCE, INTERFACE.STATIC_VECTOR, INTERFACE.MOVE_ANIMATED):
+class PLAYER(ESSENCE, INTERFACE.STATIC_VECTOR, INTERFACE.MOVE_ANIMATED, INTERFACE.CROSSABLE, INTERFACE.DRAWABLE, INTERFACE.CONTROLLED):
 
-    def __init__(self, x, y, filename):
-        ESSENCE.__init__(self, x, y, filename)
+    def __init__(self, x, y, folder):
+        ESSENCE.__init__(self, x, y, folder)
         self.forward = [274, 115]
         self.back = [273, 119]
         self.right = [275, 100]

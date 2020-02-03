@@ -6,6 +6,7 @@ import copy
 from bases.colors import COLORS
 from bases.board import BOARD
 import bases.essence as ESSENCES
+from bases.camera import CAMERA
 
 
 class LOOP():
@@ -62,11 +63,10 @@ class LOOP():
         self.textSurf.set_alpha(self.opacity)
         self.btnsSurf.fill(self.PURPLE)
         self.btnsSurf.set_alpha(self.opacity / 2)
+        # board.renderCells(self.screen, xMax=self.width, pos2=self.boardSize)
+        self.camera.render(self.screen, self.width)
 
-        self.board.renderCells(
-            self.screen, xMax=self.width, pos2=self.boardSize)
-
-        #self.screen.blit(self.textSurf, self.textSurfPos)
+        self.screen.blit(self.textSurf, self.textSurfPos)
         #self.screen.blit(self.btnsSurf, self.btnsSurfPos)
 
         self.flipEvent()
@@ -79,22 +79,17 @@ class LOOP():
         self.width, self.height = self.screen.get_size()
         self.squareSize = min(self.width / 5 * 4, self.height - 10)
 
-        self.boardSizer()
+        self.camera.boardSizer(self.width, self.height)
 
         self.textSurf = pygame.Surface(
             (self.squareSize, int(self.squareSize / 4) - 20))
         self.textSurfPos = ((self.width - self.squareSize) / 2,
                             (self.height - self.squareSize) / 2 + self.squareSize / 4 * 3 + 12)
 
-        self.btnsSurf = pygame.Surface((max(self.squareSize / 4, 20) - 5, (self.height -
-                                                                           self.squareSize) / 2 + self.squareSize / 4 * 3 + 12 - (self.height) / 5))
-        self.btnsSurfPos = (
-            self.width - max(self.squareSize / 4, 20), (self.height) / 5)
-
-    def boardSizer(self, x=30, y=15):
-        self.boardSize = (x, y)
-        self.board.autoSizer(self.width, self.height, x, y)
-        self.board.resizeEssences()
+        #self.btnsSurf = pygame.Surface((max(self.squareSize / 4, 20) - 5, (self.height -
+        #                                                                   self.squareSize) / 2 + self.squareSize / 4 * 3 + 12 - (self.height) / 5))
+        #self.btnsSurfPos = (
+        #    self.width - max(self.squareSize / 4, 20), (self.height) / 5)
 
     def create(self, thisDisabler=None, thisFlipper=None):
         pygame.NUMEVENTS += 100
@@ -106,18 +101,26 @@ class LOOP():
         pygame.mouse.set_visible(False)
         self.width, self.height = self.screen.get_size()
 
-        self.board = BOARD(40, 40, rules={"deep": 4})
-        self.boardSizer()
-        print("\n".join(list(map(lambda x: " ".join(list(map(lambda y: "{:3d}".format(int(y)), x))), self.board.cells))))
+        self.camera = CAMERA(2, 2)
 
-        #self.player = PLAYER(0, 0, "data/player")
+        board = BOARD(40, 40, rules={"deep": 4})
+        self.camera.setCameraBoard(board)
+        self.camera.boardSizer(self.width, self.height)
 
-        self.testDecor = ESSENCES.STATIC_DECORATION(
-            1, 1, folder="data/essences/decore/", texturename="redWallFire.png")
-        self.board.insertStaticEssence(self.testDecor)
+        player = ESSENCES.PLAYER(self.camera.board.cellSize * 2, self.camera.board.cellSize * 2, "data/essences/player")
+        staticImages = ["/staticForward.png", "/staticLeft.png", "/staticBack.png", "/staticRight.png"]
+        player.staticImagesInit(staticImages)
+        player.changeStaticTexture(0, 0)
+        player.load()
+        
+        self.camera.setCameraSelection(player)
+        # print("\n".join(list(map(lambda x: " ".join(list(map(lambda y: "{:3d}".format(int(y)), x))), self.board.cells)))) #map logging
+
+        #
 
         self.createNewTimer(30, 1 / self.fps * 1000, lambda: self.render())
         # main Loop
+        self.render()
         while 1:
             for Event in pygame.event.get():
                 t = Event.type

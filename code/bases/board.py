@@ -11,6 +11,19 @@ import bases.interfaces as INTERFACE
 
 class BOARD():
 
+    def createMap(self, rules):
+        #if self.cells[i][j] == 1 and self.cells[i - 1][j] != 1:
+        self.cells = INTERFACE.DANGEON_MANAGER.manager(self.width, self.height, rules)
+        for i in range(len(self.cells)):
+            for j in range(len(self.cells[i])):
+                if self.cells[i][j] == 1:
+                    self.mapTextures[(i, j)] = ESSENCES.RANDOMWALL(0, 0, "data/essences/decore/", ["floor.png"])
+                elif self.cells[i][j] == 0 and i + 1<=self.height and self.cells[i + 1][j] != 0:
+                    # create Wall Texture
+                    self.mapTextures[(i, j)] = ESSENCES.RANDOMWALL(0, 0, "data/essences/decore/", ["redWall.png", "redWallFire.png"])
+                    # self.mapTextures[(i, j)].setSize(self.cellSize)
+                        
+
     def __init__(self, width, height, rules={}):
         self.width = width
         self.height = height
@@ -18,12 +31,13 @@ class BOARD():
         self.BLACK = COLORS.BLACK
         self.x = 0
         self.y = 0
-        self.roomSize = (width, height)
-        self.cells = INTERFACE.DANGEON_MANAGER.manager(width, height, rules)
+        self.roomSize = (width, height)  
         self.surface = pygame.Surface([1, 1])
-        self.colors = [COLORS.BLACK, COLORS.GRAY]
+        self.colors = [COLORS.DARKRED, COLORS.GRAY]
         self.essences = {}
         self.staticEssences = []
+        self.mapTextures = {}
+        self.createMap(rules)
 
     def insertEssence(self, essence, program):
         if isinstance(essence, ESSENCES.ESSENCE) and isinstance(essence, INTERFACE.MOVEABLE):
@@ -52,10 +66,12 @@ class BOARD():
     def get_cell(self, pos):
         x = pos[0] - self.x
         y = pos[1] - self.y
+        '''
         if x < 0 or y < 0:
             return None
         if x > self.width * self.cellSize or y > self.height * self.cellSize:
             return None
+        '''
         resX = x // self.cellSize
         resY = y // self.cellSize
         return resX, resY
@@ -65,6 +81,11 @@ class BOARD():
             self.staticEssences[item].load()
             self.staticEssences[item].setSize(size=self.cellSize)
             self.staticEssences[item].setPos(size=self.cellSize)
+
+        for item in self.mapTextures:
+            self.mapTextures[item].load()
+            self.mapTextures[item].setSize(size=self.cellSize)
+            self.mapTextures[item].setPos(size=self.cellSize)
 
     def on_click(self, cell):
         pass
@@ -82,24 +103,26 @@ class BOARD():
         if toPos == None:
             toPos = (self.width, self.height)
         for item in self.staticEssences:
-            screen.blit(item.image, item.rect)
+            item.draw()
 
     def renderCells(self, screen, pos=(0, 0), pos2=None, xMax=0) :
         if pos2 is None:
-            pos2 = (pos[0] + 20, pos[1] + 15)
+            pos2 = (pos[0] + 15, pos[1] + 15)
         self.surface.fill(self.BLACK)
         iX = 0
         iY = 0
         for i in range(pos[0], pos2[0] + 1):
-            iY = 0
+            iX = 0
             for j in range(pos[1], pos2[1] + 1):
-                if i <= self.width and j <= self.height:
+                if i <= self.height and j <= self.width:
                     pygame.draw.rect(self.surface, self.colors[self.cells[i][j]], (self.x + iX * self.cellSize,
                                                              self.y + iY * self.cellSize, self.cellSize, self.cellSize))
+                    if (i, j) in self.mapTextures:
+                        self.mapTextures[(i, j)].draw_per_coords(self.surface, self.x + iX * self.cellSize, self.y + iY * self.cellSize)
                 else:
                     pygame.draw.rect(self.surface, COLORS.BLACK, (self.x + iX * self.cellSize,
                                                              self.y + iY * self.cellSize, self.cellSize, self.cellSize), 3)
-                iY += 1
-            iX += 1
+                iX += 1
+            iY += 1
         self.renderStaticEssenses(self.surface, fromPos=pos, toPos=(pos[0] + pos2[0], pos[1] + pos2[1]))
-        screen.blit(self.surface, (int((xMax - self.cellSize * pos2[0]) / 2), 0))
+        screen.blit(self.surface, (int((xMax - self.cellSize * (pos2[0] - 1)) / 2), 0))

@@ -13,3 +13,4 @@ class COLORS():
 	GRAY = (100, 100, 100)
 	LIGHTGRAY = (150, 150, 150)
 	DARKGRAY = (20, 20, 20)
+	DARKRED = (90, 30, 30)
