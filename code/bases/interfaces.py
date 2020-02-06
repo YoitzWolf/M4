@@ -6,10 +6,11 @@
 import pygame
 
 class IMAGE_LOADER():
-    def load(self):
+    def load(self, size=32):
         self.image = pygame.image.load(self.folder + self.texturename).convert_alpha()
         self.rect = self.image.get_rect()
         self.mask = pygame.mask.from_surface(self.image)
+        self.setSize(size)
 
 class DRAWABLE():
     def draw(self, screen):
@@ -43,6 +44,9 @@ class STATICABLE():
 
 class MOVEABLE():
 
+    def changeMoveTexture(self, *arg, **args):
+        pass
+
     def moveableInit(self):
         self.movingFrame = 0
         self.movingVector = 0
@@ -56,20 +60,18 @@ class MOVEABLE():
     def move(self, x, y):
         self.movingFrame = (self.movingFrame + 1) % 2
         if self.x < x:
-            # down
+            # right
             self.movingVector = 0
         if self.y > y:
-            # left
+            # down
             self.movingVector = 1
         if self.x > x:
-            # up
+            # left
             self.movingVector = 2
         elif self.y < y:
             # right
             self.movingVector = 3
-
-        if self.issubclass(MOVE_ANIMATED):
-            self.changeMoveTexture(self.movingFrame, self.movingVector)
+        self.changeMoveTexture(self.movingFrame, self.movingVector)
         self.rect.x = x
         self.rect.y = y
         self.x = x
@@ -81,7 +83,8 @@ class MOVEABLE():
 class MOVE_ANIMATED(MOVEABLE):
 
     def moveImagesInit(self, moveImages):
-        self.texturename = moveImages
+        self.texturename = moveImages[0][0]
+        self.moveImages = moveImages
 
     def changeMoveTexture(self, frame, vector):
         if frame == -1:
@@ -91,20 +94,12 @@ class MOVE_ANIMATED(MOVEABLE):
             self.texturename = self.moveImages[vector][frame]
 
 
-class MOVE_FRAME(MOVEABLE):
-
-    def moveImagesInit(self):
-        self.texturename = moveImages
-
+class MOVE_FRAME(MOVE_ANIMATED):
     def changeMoveTexture(self, frame, vector):
         self.texturename = self.moveImages[frame]
 
 
-class MOVE_VECTOR(MOVEABLE):
-
-    def moveImagesInit(self):
-        self.moveImages = moveImages
-
+class MOVE_VECTOR(MOVE_ANIMATED):
     def changeMoveTexture(self, frame, vector):
         self.texturename = self.moveImages[vector]
 
@@ -138,10 +133,10 @@ class STATIC_FRAME(STATICABLE):
 
 class CONTROLLED(MOVEABLE):
     def initControlKeys(self, keys={}):
-        self.forward = keys["forward"] + [{"vector" : 0}]
-        self.back = keys["back"] + [{"vector" : 0}]
-        self.right = keys["right"] + [{"vector" : 0}]
-        self.left = keys["left"] + [{"vector" : 0}]
+        self.forward = keys["forward"]
+        self.back = keys["back"]
+        self.right = keys["right"] 
+        self.left = keys["left"]
         self.lastKey = None
         self.all = self.forward + self.back + self.right + self.left
         self.moveableInit()
@@ -152,7 +147,8 @@ class CONTROLLED(MOVEABLE):
     def keyManager(self, key, ads):
         if not ads and key == self.lastKey:
             self.lastKey = None
-        else:
+            self.changeStaticTexture(self.movingFrame, self.movingVector)
+        elif ads:
             self.lastKey = key # list(filter(lambda x: (key in x), [self.forward + [], self.back + [], self.right + [], self.left + []]))
 
     def moveManager(self):
@@ -162,7 +158,7 @@ class CONTROLLED(MOVEABLE):
             return [(self.rect.x, self.rect.y - self.speed), (self.rect.x + self.rect.width, self.rect.y + self.rect.height - self.speed)]
         elif self.lastKey in self.right:
             return [(self.rect.x + self.speed, self.rect.y), (self.rect.x + self.rect.width + self.speed, self.rect.y + self.rect.height)]
-        elif self.lastKey in self.back:
+        elif self.lastKey in self.left:
             return [(self.rect.x - self.speed, self.rect.y), (self.rect.x + self.rect.width - self.speed, self.rect.y + self.rect.height)]
 
 #UI METHODS

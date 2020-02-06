@@ -53,8 +53,8 @@ class LOOP():
         pygame.time.set_timer(eventName, int(thisTime))
         self.timers[eventName] = (thisTime, event)
 
-    def reloadBulletsPoses(self):
-        pass
+    def reloadPoses(self):
+        self.camera.selectedModelPosManager()
 
     def render(self):
         self.screen.fill(self.BLACK)
@@ -86,9 +86,9 @@ class LOOP():
         self.textSurfPos = ((self.width - self.squareSize) / 2,
                             (self.height - self.squareSize) / 2 + self.squareSize / 4 * 3 + 12)
 
-        #self.btnsSurf = pygame.Surface((max(self.squareSize / 4, 20) - 5, (self.height -
+        # self.btnsSurf = pygame.Surface((max(self.squareSize / 4, 20) - 5, (self.height -
         #                                                                   self.squareSize) / 2 + self.squareSize / 4 * 3 + 12 - (self.height) / 5))
-        #self.btnsSurfPos = (
+        # self.btnsSurfPos = (
         #    self.width - max(self.squareSize / 4, 20), (self.height) / 5)
 
     def create(self, thisDisabler=None, thisFlipper=None):
@@ -107,17 +107,26 @@ class LOOP():
         self.camera.setCameraBoard(board)
         self.camera.boardSizer(self.width, self.height)
 
-        player = ESSENCES.PLAYER(self.camera.board.cellSize * 2, self.camera.board.cellSize * 2, "data/essences/player")
-        staticImages = ["/staticForward.png", "/staticLeft.png", "/staticBack.png", "/staticRight.png"]
+        player = ESSENCES.PLAYER(self.camera.board.cellSize * 2,
+                                 self.camera.board.cellSize * 2, "data/essences/player")
+
+        staticImages = ["/staticRight.png", "/staticBack.png","/staticLeft.png", "/staticForward.png"]
+        movingImages = [["/goRight0.png", "/goRight1.png"], ["/goBack0.png", "/goBack1.png"], ["/goLeft0.png", "/goLeft1.png"], ["/goForward0.png", "/goForward1.png"]]
+
         player.staticImagesInit(staticImages)
+        player.moveImagesInit(movingImages)
+
         player.changeStaticTexture(0, 0)
         player.load()
-        
+
         self.camera.setCameraSelection(player)
-        # print("\n".join(list(map(lambda x: " ".join(list(map(lambda y: "{:3d}".format(int(y)), x))), self.board.cells)))) #map logging
+        # print("\n".join(list(map(lambda x: " ".join(list(map(lambda y:
+        # "{:3d}".format(int(y)), x))), self.board.cells)))) #map logging
 
         #
 
+        
+        self.createNewTimer(31, 1 / self.fps * 4000, lambda: self.reloadPoses())
         self.createNewTimer(30, 1 / self.fps * 1000, lambda: self.render())
         # main Loop
         self.render()
@@ -127,7 +136,8 @@ class LOOP():
                 if t == self.sizeChanged:
                     self.reloadSize(Event)
                 if t == self.keyDown or t == self.keyUp:
-                    self.camera.keysInterpretator(Event.key, (t == self.keyDown))
+                    self.camera.keysInterpretator(
+                        Event.key, (t == self.keyDown))
                 if t == self.quit:
                     self.disableEvent()
                     return

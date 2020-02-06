@@ -31,6 +31,8 @@ class CAMERA():
         if self.selected is not None and self.selected.useable(key):
             self.selected.keyManager(key, activated)
 
+    def selectedModelPosManager(self):
+        self.selected = self.board.movePlayer(self.selected, self.width, self.height)
 
     def render(self, screen, width):
         if self.board is None:
@@ -40,11 +42,5 @@ class CAMERA():
             print("ERROR NO SELECTED ESSENCE IN CAMERA")
             return None
         # center poses
-        self.selected = self.board.movePlayer(self.selected)
-        lX ,lY = self.board.get_cell((self.selected.x + self.selected.rect.width, self.selected.y + self.selected.rect.height))
-        if lX <= self.width:
-            lX = self.width + 1
-        if lY <= self.height:
-            lY = self.height + 1
         self.board.renderCells(
-            screen, xMax=width, pos=(lX-self.width - 1, lY - self.height - 1), pos2=(lX+self.width+1, lY+self.height+1))
+            screen, size=(self.width, self.height), centered=self.selected, xMax=width)

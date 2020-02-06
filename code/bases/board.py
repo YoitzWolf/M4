@@ -65,14 +65,8 @@ class BOARD():
         self.cells = newCells
 
     def get_cell(self, pos):
-        x = pos[0] - self.x
-        y = pos[1] - self.y
-        '''
-        if x < 0 or y < 0:
-            return None
-        if x > self.width * self.cellSize or y > self.height * self.cellSize:
-            return None
-        '''
+        x = pos[0]# - self.x
+        y = pos[1]# - self.y
         resX = x // self.cellSize
         resY = y // self.cellSize
         return resX, resY
@@ -116,22 +110,28 @@ class BOARD():
         self.player.setSize(size=self.cellSize)
         return self.player
 
-    def movePlayer(self, unit):
+    def movePlayer(self, unit, w, h):
         self.player = unit
         move_place = self.player.moveManager()
         if move_place is not None:
-            self.player.move(*move_place[1])
+            move_place = (move_place[0][0] % ((2*w+1)*self.cellSize), move_place[0][1] % ((2*h+1)*self.cellSize) )
+            self.player.move(move_place[0], move_place[1])
+        # print(self.player.x, self.player.y)
+        self.player.load(self.cellSize)
         return self.player
 
-    def renderCells(self, screen, pos=(0, 0), pos2=None, xMax=0) :
-        if pos2 is None:
-            pos2 = (pos[0] + 15, pos[1] + 15)
+    def renderCells(self, screen, size=(0, 0), centered=None, xMax=0) :
+        if size is None:
+            size = (2, 2)
+        p = self.get_cell([centered.x, centered.y])
+        pos = [p[0] - 1 - size[0], p[1] - 1 - size[1]]
+        pos2 = (pos[0] + size[0] + 1, pos[1] + size[1] + 1)
         self.surface.fill(self.BLACK)
         iX = 0
         iY = 0
-        for i in range(pos[0], pos2[0] + 1):
+        for i in range(pos[1], pos2[1] + 1):
             iX = 0
-            for j in range(pos[1], pos2[1] + 1):
+            for j in range(pos[0], pos2[0] + 1):
                 if i <= self.height and j <= self.width:
                     pygame.draw.rect(self.surface, self.colors[self.cells[i][j]], (self.x + iX * self.cellSize,
                                                              self.y + iY * self.cellSize, self.cellSize, self.cellSize))
@@ -139,6 +139,8 @@ class BOARD():
                         self.mapTextures[(i, j)].draw_per_coords(self.surface, self.x + iX * self.cellSize, self.y + iY * self.cellSize)
                 else:
                     pygame.draw.rect(self.surface, COLORS.BLACK, (self.x + iX * self.cellSize,
+                                                             self.y + iY * self.cellSize, self.cellSize, self.cellSize), 3)
+                pygame.draw.rect(self.surface, (255, 255, 255), (self.x + iX * self.cellSize,
                                                              self.y + iY * self.cellSize, self.cellSize, self.cellSize), 3)
                 iX += 1
             iY += 1
