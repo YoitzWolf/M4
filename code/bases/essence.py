@@ -69,4 +69,4 @@ class PLAYER(ESSENCE, INTERFACE.STATIC_VECTOR, INTERFACE.MOVE_ANIMATED, INTERFAC
                     "right": [275, 100],
                     "left": [276, 97]
                 })
-        self.rawSpeed = 16
+        self.rawSpeed = 8

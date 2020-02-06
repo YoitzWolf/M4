@@ -29,7 +29,7 @@ class CAMERA(INTERFACE.CONTROLLED):
         if self.board is not None:
             self.selected = essence
             self.selected = self.board.insertPlayer(self.selected)
-            
+
         else:
             print("ERROR NO SELECTED BOARD IN CAMERA")
 
@@ -61,8 +61,9 @@ class CAMERA(INTERFACE.CONTROLLED):
         last = self.selected.x, self.selected.y
         self.selected = self.board.movePlayer(self.selected, self.width, self.height)
         new = self.selected.x, self.selected.y
-        self.deltaX += new[0] - last[0]
-        self.deltaY += new[1] - last[1]
+        self.deltaX += (new[0] - last[0])
+        self.deltaY += (new[1] - last[1])
+        #print(self.deltaX, self.deltaY)
 
     def render(self, screen, width):
         if self.board is None:

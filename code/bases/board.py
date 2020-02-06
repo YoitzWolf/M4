@@ -118,8 +118,15 @@ class BOARD():
         self.player = unit
         move_place = self.player.moveManager()
         if move_place is not None:
-            move_place = (move_place[0][0] % ((2*w+1)*self.cellSize), move_place[0][1] % ((2*h+1)*self.cellSize) )
-            self.player.move(move_place[0], move_place[1])
+            move_place = move_place[0][0], move_place[0][1]
+            if self.player.x == move_place[0]:
+                cell = self.get_cell(move_place[0], move_place[1] + self.player.rect.height)
+            elif self.player.x < move_place[0]:
+                cell = self.get_cell(move_place[0] + self.player.rect.width, move_place[1] + self.player.rect.height)
+            else:
+                cell = self.get_cell(move_place[0], move_place[1] + self.player.rect.height)
+            if self.cells[cell[1]][cell[0]]:
+                self.player.move(move_place[0], move_place[1])
         # print(self.player.x, self.player.y)
         self.player.load(self.cellSize)
         return self.player
@@ -136,8 +143,8 @@ class BOARD():
                 if (i, j) in self.mapTextures:
                     self.mapTextures[(i, j)].draw_per_coords(self.surface, self.x + iX * self.cellSize, self.y + iY * self.cellSize)
 
-                pygame.draw.rect(self.surface, (255, 255, 255), (self.x + iX * self.cellSize,
-                                                             self.y + iY * self.cellSize, self.cellSize, self.cellSize), 3)
+                #pygame.draw.rect(self.surface, (255, 255, 255), (self.x + iX * self.cellSize,
+                #                                             self.y + iY * self.cellSize, self.cellSize, self.cellSize), 3)
                 iX += 1
             iY += 1
         self.renderStaticEssenses(self.surface, fromPos=(0, 0), toPos=(100, 100))

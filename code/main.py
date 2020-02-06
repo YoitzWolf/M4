@@ -102,7 +102,7 @@ class LOOP():
 
         self.camera = CAMERA(7, 7)
 
-        board = BOARD(40, 40, rules={"deep": 4})
+        board = BOARD(25, 25, rules={"deep": 4})
         self.camera.setCameraBoard(board)
         self.camera.boardSizer(self.width, self.height)
 
