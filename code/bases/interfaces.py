@@ -58,6 +58,7 @@ class MOVEABLE():
         self.movingVector = vector
 
     def move(self, x, y):
+        
         self.movingFrame = (self.movingFrame + 1) % 2
         if self.x < x:
             # right

@@ -9,6 +9,11 @@ from bases.colors import COLORS
 import bases.interfaces as INTERFACE
 
 
+class ROOM():
+    def __init__(self, map, essences):
+        pass
+
+
 class BOARD():
 
     def createMap(self, rules):
@@ -64,9 +69,7 @@ class BOARD():
                 newCells[i][j] = self.cells[i][j]
         self.cells = newCells
 
-    def get_cell(self, pos):
-        x = pos[0]# - self.x
-        y = pos[1]# - self.y
+    def get_cell(self, x, y):
         resX = x // self.cellSize
         resY = y // self.cellSize
         return resX, resY
@@ -84,6 +87,7 @@ class BOARD():
             self.mapTextures[item].load()
             self.mapTextures[item].setSize(size=self.cellSize)
             self.mapTextures[item].setPos(size=self.cellSize)
+        return self.player
 
     def on_click(self, cell):
         pass
@@ -94,8 +98,8 @@ class BOARD():
             self.on_click(cell)
 
     def autoSizer(self, width, height, cellCountX, cellCountY):
-        self.cellSize = int(min(width / cellCountX, height / cellCountY))
-        self.surface = pygame.Surface([cellCountX * self.cellSize, cellCountY * self.cellSize])
+        self.cellSize = int(height / cellCountY)
+        self.surface = pygame.Surface([self.width * self.cellSize, self.height * self.cellSize])
 
     def renderStaticEssenses(self, screen, fromPos=(0, 0), toPos=None):
         if toPos == None:
@@ -120,29 +124,21 @@ class BOARD():
         self.player.load(self.cellSize)
         return self.player
 
-    def renderCells(self, screen, size=(0, 0), centered=None, xMax=0) :
-        if size is None:
-            size = (2, 2)
-        p = self.get_cell([centered.x, centered.y])
-        pos = [p[0] - 1 - size[0], p[1] - 1 - size[1]]
-        pos2 = (pos[0] + size[0] + 1, pos[1] + size[1] + 1)
+    def renderCells(self, screen, delta=[0, 0]) :
         self.surface.fill(self.BLACK)
         iX = 0
         iY = 0
-        for i in range(pos[1], pos2[1] + 1):
+        for i in range(0, len(self.cells)):
             iX = 0
-            for j in range(pos[0], pos2[0] + 1):
-                if i <= self.height and j <= self.width:
-                    pygame.draw.rect(self.surface, self.colors[self.cells[i][j]], (self.x + iX * self.cellSize,
-                                                             self.y + iY * self.cellSize, self.cellSize, self.cellSize))
-                    if (i, j) in self.mapTextures:
-                        self.mapTextures[(i, j)].draw_per_coords(self.surface, self.x + iX * self.cellSize, self.y + iY * self.cellSize)
-                else:
-                    pygame.draw.rect(self.surface, COLORS.BLACK, (self.x + iX * self.cellSize,
-                                                             self.y + iY * self.cellSize, self.cellSize, self.cellSize), 3)
+            for j in range(0, len(self.cells[0])):
+                pygame.draw.rect(self.surface, self.colors[self.cells[i][j]], (self.x + iX * self.cellSize,
+                                                         self.y + iY * self.cellSize, self.cellSize, self.cellSize))
+                if (i, j) in self.mapTextures:
+                    self.mapTextures[(i, j)].draw_per_coords(self.surface, self.x + iX * self.cellSize, self.y + iY * self.cellSize)
+
                 pygame.draw.rect(self.surface, (255, 255, 255), (self.x + iX * self.cellSize,
                                                              self.y + iY * self.cellSize, self.cellSize, self.cellSize), 3)
                 iX += 1
             iY += 1
-        self.renderStaticEssenses(self.surface, fromPos=pos, toPos=(pos[0] + pos2[0], pos[1] + pos2[1]))
-        screen.blit(self.surface, (int((xMax - self.cellSize * (pos2[0] - 1)) / 2), 0))
+        self.renderStaticEssenses(self.surface, fromPos=(0, 0), toPos=(100, 100))
+        screen.blit(self.surface, (0 - delta[0], 0 - delta[1]))

@@ -77,14 +77,13 @@ class LOOP():
         self.screen = pygame.display.set_mode(
             event.dict['size'], pygame.RESIZABLE)
         self.width, self.height = self.screen.get_size()
-        self.squareSize = min(self.width / 5 * 4, self.height - 10)
-
+        #self.squareSize = min(self.width / 5 * 4, self.height - 10)
         self.camera.boardSizer(self.width, self.height)
 
-        self.textSurf = pygame.Surface(
-            (self.squareSize, int(self.squareSize / 4) - 20))
-        self.textSurfPos = ((self.width - self.squareSize) / 2,
-                            (self.height - self.squareSize) / 2 + self.squareSize / 4 * 3 + 12)
+        #self.textSurf = pygame.Surface(
+        #    (self.squareSize, int(self.squareSize / 4) - 20))
+        #self.textSurfPos = ((self.width - self.squareSize) / 2,
+        #                    (self.height - self.squareSize) / 2 + self.squareSize / 4 * 3 + 12)
 
         # self.btnsSurf = pygame.Surface((max(self.squareSize / 4, 20) - 5, (self.height -
         #                                                                   self.squareSize) / 2 + self.squareSize / 4 * 3 + 12 - (self.height) / 5))
@@ -98,16 +97,16 @@ class LOOP():
         if thisFlipper is not None:
             self.flipEvent = thisFlipper
         pygame.init()
-        pygame.mouse.set_visible(False)
+        #pygame.mouse.set_visible(False)
         self.width, self.height = self.screen.get_size()
 
-        self.camera = CAMERA(2, 2)
+        self.camera = CAMERA(7, 7)
 
         board = BOARD(40, 40, rules={"deep": 4})
         self.camera.setCameraBoard(board)
         self.camera.boardSizer(self.width, self.height)
 
-        player = ESSENCES.PLAYER(self.camera.board.cellSize * 2,
+        player = ESSENCES.PLAYER(self.camera.board.cellSize * 4,
                                  self.camera.board.cellSize * 2, "data/essences/player")
 
         staticImages = ["/staticRight.png", "/staticBack.png","/staticLeft.png", "/staticForward.png"]
@@ -146,6 +145,6 @@ class LOOP():
 
 
 if __name__ == '__main__':
-    screen = pygame.display.set_mode((720, 360), pygame.RESIZABLE)
+    screen = pygame.display.set_mode((720, 360))
     loop = LOOP(screen, pygame.quit, pygame.display.flip)
     loop.create()
