@@ -28,6 +28,7 @@ class BOARD():
         self.width = width
         self.height = height
         self.cellSize = None
+        self.player = None
         self.BLACK = COLORS.BLACK
         self.x = 0
         self.y = 0
@@ -77,6 +78,9 @@ class BOARD():
         return resX, resY
 
     def resizeEssences(self):
+        if self.player is not None:
+            self.player.setSize(size=self.cellSize)
+
         for item in range(len(self.staticEssences)):
             self.staticEssences[item].load()
             self.staticEssences[item].setSize(size=self.cellSize)
@@ -103,7 +107,21 @@ class BOARD():
         if toPos == None:
             toPos = (self.width, self.height)
         for item in self.staticEssences:
-            item.draw()
+            item.draw(screen)
+        if self.player is not None:
+            self.player.draw(screen)
+
+    def insertPlayer(self, unit):
+        self.player = unit
+        self.player.setSize(size=self.cellSize)
+        return self.player
+
+    def movePlayer(self, unit):
+        self.player = unit
+        move_place = self.player.moveManager()
+        if move_place is not None:
+            self.player.move(*move_place[1])
+        return self.player
 
     def renderCells(self, screen, pos=(0, 0), pos2=None, xMax=0) :
         if pos2 is None:

@@ -16,6 +16,7 @@ class ESSENCE(pygame.sprite.Sprite, INTERFACE.IMAGE_LOADER):
         self.y = y
         self.folder = folder
         self.size = 32
+        self.rawSpeed = 0
         
        
     def render(self, screen):
@@ -62,7 +63,10 @@ class PLAYER(ESSENCE, INTERFACE.STATIC_VECTOR, INTERFACE.MOVE_ANIMATED, INTERFAC
 
     def __init__(self, x, y, folder):
         ESSENCE.__init__(self, x, y, folder)
-        self.forward = [274, 115]
-        self.back = [273, 119]
-        self.right = [275, 100]
-        self.left = [276, 97]
+        self.initControlKeys({
+                    "forward": [274, 115],
+                    "back": [273, 119],
+                    "right": [275, 100],
+                    "left": [276, 97]
+                })
+        self.rawSpeed = 32

@@ -5,11 +5,6 @@
 '''
 import pygame
 
-class CONTROLLED():
-    def initControlKeys(self, keys={}):
-        pass
-
-
 class IMAGE_LOADER():
     def load(self):
         self.image = pygame.image.load(self.folder + self.texturename).convert_alpha()
@@ -46,7 +41,6 @@ class STATICABLE():
     def changeVector(self, vector):
         self.movingVector = vector
 
-
 class MOVEABLE():
 
     def moveableInit(self):
@@ -74,7 +68,7 @@ class MOVEABLE():
             # right
             self.movingVector = 3
 
-        if issubclass(self, MOVE_ANIMATED):
+        if self.issubclass(MOVE_ANIMATED):
             self.changeMoveTexture(self.movingFrame, self.movingVector)
         self.rect.x = x
         self.rect.y = y
@@ -141,6 +135,35 @@ class STATIC_FRAME(STATICABLE):
     def changeStaticTexture(self, frame, vector):
         self.texturename = self.staticImages[frame]
 
+
+class CONTROLLED(MOVEABLE):
+    def initControlKeys(self, keys={}):
+        self.forward = keys["forward"] + [{"vector" : 0}]
+        self.back = keys["back"] + [{"vector" : 0}]
+        self.right = keys["right"] + [{"vector" : 0}]
+        self.left = keys["left"] + [{"vector" : 0}]
+        self.lastKey = None
+        self.all = self.forward + self.back + self.right + self.left
+        self.moveableInit()
+
+    def useable(self, key):
+        return (key in self.all)
+
+    def keyManager(self, key, ads):
+        if not ads and key == self.lastKey:
+            self.lastKey = None
+        else:
+            self.lastKey = key # list(filter(lambda x: (key in x), [self.forward + [], self.back + [], self.right + [], self.left + []]))
+
+    def moveManager(self):
+        if self.lastKey in self.forward:
+            return [(self.rect.x, self.rect.y + self.speed), (self.rect.x + self.rect.width, self.rect.y + self.rect.height + self.speed)]
+        elif self.lastKey in self.back:
+            return [(self.rect.x, self.rect.y - self.speed), (self.rect.x + self.rect.width, self.rect.y + self.rect.height - self.speed)]
+        elif self.lastKey in self.right:
+            return [(self.rect.x + self.speed, self.rect.y), (self.rect.x + self.rect.width + self.speed, self.rect.y + self.rect.height)]
+        elif self.lastKey in self.back:
+            return [(self.rect.x - self.speed, self.rect.y), (self.rect.x + self.rect.width - self.speed, self.rect.y + self.rect.height)]
 
 #UI METHODS
 import sys

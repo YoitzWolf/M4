@@ -126,6 +126,8 @@ class LOOP():
                 t = Event.type
                 if t == self.sizeChanged:
                     self.reloadSize(Event)
+                if t == self.keyDown or t == self.keyUp:
+                    self.camera.keysInterpretator(Event.key, (t == self.keyDown))
                 if t == self.quit:
                     self.disableEvent()
                     return
