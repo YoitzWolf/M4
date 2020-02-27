@@ -1,0 +1,14 @@
+$-MUSIC-$
+$FOLDER = data/music
+$-SCORES-$
+$BEST = 0
+$LAST = 0
+$-FONTS-$
+$FONT = data/ps2p-rr.ttf
+$-TEXTURES-$
+$SHIP = data/bg/ship
+$BULLET = data/bg/bullet
+$BASTARD = data/bg/bastard
+
+$-END-$
+next can be all info but game wont see it
